@@ -16,6 +16,9 @@ setup(
     extras_require = {
         'test': [
             'nose',
+            ],
+        'carte_blanche': [
+            'pandas',
             ]
         },
     classifiers=[
