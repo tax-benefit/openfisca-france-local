@@ -6,7 +6,6 @@ import os
 import numpy
 import sys
 
-
 periode = '2018-11'
 periodes = [periode]
 calculs = {
@@ -19,14 +18,6 @@ m3 = '2018-10'
 m2 = '2018-09'
 m1 = '2018-08'
 m0 = '2018-07'
-
-
-def process_cmuc(reelle, calculee):
-    print (numpy.histogram(calculee))
-
-process = {
-    'cmu_c': process_cmuc
-}
 
 n_limit = 20000
 def generate_CAF(path):
@@ -80,30 +71,35 @@ def generate_CAF(path):
 
     return situations
 
-inputpath = sys.argv[-1]
-filepath = os.path.splitext(inputpath)[0]
-situation =  generate_CAF(inputpath)
 
-tax_benefit_system = openfisca_france.CountryTaxBenefitSystem()
-simulation_actuelle = Simulation(
-    tax_benefit_system=tax_benefit_system,
-    simulation_json=situation)
+def main():
+    inputpath = sys.argv[-1]
+    filepath = os.path.splitext(inputpath)[0]
+    situation =  generate_CAF(inputpath)
 
-import pandas as pd
-csv_input = pd.read_csv(inputpath, sep=";", nrows=n_limit)
+    tax_benefit_system = openfisca_france.CountryTaxBenefitSystem()
+    simulation_actuelle = Simulation(
+        tax_benefit_system=tax_benefit_system,
+        simulation_json=situation)
 
-for calcul, periodes in calculs.iteritems():
-    print(calcul)
-    ids = simulation_actuelle.get_variable_entity(calcul).ids
-    for periode in periodes:
-        valeurs = simulation_actuelle.calculate(calcul, periode)
-        sources = simulation_actuelle.calculate(calcul, m3)
+    import pandas as pd
+    csv_input = pd.read_csv(inputpath, sep=";", nrows=n_limit)
 
-        csv_input['_'.join(['openfisca', calcul, periode])] = valeurs
-        print (numpy.histogram(valeurs - sources))
+    for calcul, periodes in calculs.iteritems():
+        print(calcul)
+        ids = simulation_actuelle.get_variable_entity(calcul).ids
+        for periode in periodes:
+            valeurs = simulation_actuelle.calculate(calcul, periode)
+            sources = simulation_actuelle.calculate(calcul, m3)
 
-        resultat = dict(zip(ids, zip(valeurs, sources)))
-        for matricul, valeurs in resultat.iteritems():
-            calculee, reelle = valeurs
+            csv_input['_'.join(['openfisca', calcul, periode])] = valeurs
+            print (numpy.histogram(valeurs - sources))
 
-csv_input.to_csv(filepath + '.out.csv', index=False)
+            resultat = dict(zip(ids, zip(valeurs, sources)))
+            for matricul, valeurs in resultat.iteritems():
+                calculee, reelle = valeurs
+
+    csv_input.to_csv(filepath + '.out.csv', index=False)
+
+if __name__ == '__main__':
+    sys.exit(main())
