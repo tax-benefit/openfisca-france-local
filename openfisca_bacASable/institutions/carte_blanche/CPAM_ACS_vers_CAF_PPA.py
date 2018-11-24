@@ -37,11 +37,12 @@ situations = {
 }
 
 ressourceMapping = {
-    'MNTSAL_RES': 'salaire_net',
-#    'MNTBOU_RES': '',
-#    'MNTCHO_RES': 'chomage',
-    'MNTPER_RES': 'pensions_alimentaires_percues',
-    'MNTRET_RES': 'retraite_nette',
+    'MNTSAL_RES': 'salaire_net', # Traitements et salaires
+#    'MNTBOU_RES': '', # Bourses étude enseignement sup.
+#    'MNTCHO_RES': 'chomage', # Allocations chômage
+    'MNTPER_RES': 'pensions_alimentaires_percues', # Pensions alimentaires reçues
+    'MNTRET_RES': 'retraite_nette', # Pensions, retraites et rentes
+    'MNTPRE_RES': 'retraite_nette', # Préretraites
 }
 
 def main():
@@ -155,14 +156,19 @@ def main():
             individu = situations['individus'][MATRICUL]
             for inputName, outputName in ressourceMapping.iteritems():
                 individu[outputName] = {
-                    month: float(row[inputName].replace(',', '.')) / 12 for month in months
+                    month: 0 for month in months
                 }
+
+            for inputName, outputName in ressourceMapping.iteritems():
+                for month in months:
+                    individu[outputName][month] += float(row[inputName].replace(',', '.')) / 12
 
             famille = situations['familles'][GROUP]
             famille['aide_logement'] = {
                 month: float(row['MNTAPL_RES'].replace(',', '.')) / 12 for month in months
             }
             famille['aide_logement'][periode] = float(row['MNTAPL_RES'].replace(',', '.')) / 12
+            famille['cmu_forfait_logement_al'] = { periode: float(row['MNTAPL_RES'].replace(',', '.')) }
 
             n = n + 1
         print(n)
@@ -196,10 +202,9 @@ def main():
 
             results[calcul + periode_1] = sources
             results[calcul + periode] = valeurs
+            results[calcul + 'adiff'] = abs(sources - valeurs)
 
-            resultat = dict(zip(ids, zip(valeurs, sources)))
-            for matricul, valeurs in resultat.iteritems():
-                calculee, reelle = valeurs
+            results = results.sort_values(by=[calcul + 'adiff'], ascending=False)
 
     if len(ids) == 1:
         simulation_actuelle.tracer.print_computation_log()
