@@ -47,7 +47,7 @@ ressourceMapping = {
 def main():
     periode = '2018-11'
     periode_1 = '2018-10'
-    months = period('year:2017-10').offset(-1, 'year').get_subperiods('month')
+    months = period('year:2018-11').offset(-1, 'year').get_subperiods('month')
 
     periodes = [periode]
     calculs = {
@@ -64,7 +64,7 @@ def main():
     ]
 
     ids = []
-    n_limit = 10e1
+    n_limit = 10e10
 
     import datetime
     now = datetime.datetime.now()
@@ -88,8 +88,12 @@ def main():
                 'acs_plafond': {
                     periode_1: row['ACSPLA_CMU']
                 },
+                'aspa': { m: 0 for m in months },
                 'cmu_c': {
                     periode_1: row['C'] == 'A'
+                },
+                'cmu_base_ressources': {
+                    periode_1: row['TOTMNT_CMU'].replace(',', '.')
                 },
                 'rsa': {
                     periode: 0
@@ -153,6 +157,13 @@ def main():
                 individu[outputName] = {
                     month: float(row[inputName].replace(',', '.')) / 12 for month in months
                 }
+
+            famille = situations['familles'][GROUP]
+            famille['aide_logement'] = {
+                month: float(row['MNTAPL_RES'].replace(',', '.')) / 12 for month in months
+            }
+            famille['aide_logement'][periode] = float(row['MNTAPL_RES'].replace(',', '.')) / 12
+
             n = n + 1
         print(n)
 
