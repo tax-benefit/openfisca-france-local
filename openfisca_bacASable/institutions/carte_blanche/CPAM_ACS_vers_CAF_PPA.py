@@ -4,21 +4,10 @@ import openfisca_france
 
 import sys
 
-periode = '2018-11'
-periode_1 = '2018-10'
-periodes = [periode]
-calculs = {
-    'acs_plafond': periodes,
-    'acs': periodes,
-    'cmu_base_ressources': periodes,
-#    'cmu_c': periodes,
-}
 
-import csv
+from openfisca_core.periods import period
 
-paths = [
-    'cmu', 'coc', 'res'
-]
+
 
 class StripperReader(object):
     def __init__(self, reader):
@@ -37,8 +26,8 @@ class StripperReader(object):
         return self.op(self.reader.next())
 
 
-def getPath(key):
-    return sys.argv[-1].format(key)
+def getPath(key, ext=''):
+    return sys.argv[-1].format(key) + ext
 
 situations = {
   'individus': {},
@@ -56,8 +45,31 @@ ressourceMapping = {
 }
 
 def main():
+    periode = '2018-11'
+    periode_1 = '2018-10'
+    months = period('year:2017-10').offset(-1, 'year').get_subperiods('month')
+
+    periodes = [periode]
+    calculs = {
+        #'acs_plafond': periodes,
+        #'acs': periodes,
+        'cmu_base_ressources': periodes,
+        #'cmu_c': periodes,
+    }
+
+    import csv
+
+    paths = [
+        'cmu', 'coc', 'res'
+    ]
+
     ids = []
-    n_limit = 100
+    n_limit = 10e1
+
+    import datetime
+    now = datetime.datetime.now()
+    timestamp = now.isoformat().replace(':','-').replace('.', '-')
+
     with open(getPath('cmu')) as csvfile:
         reader = StripperReader(csv.DictReader(csvfile, delimiter=';'))
         n = 0
@@ -139,19 +151,27 @@ def main():
             individu = situations['individus'][MATRICUL]
             for inputName, outputName in ressourceMapping.iteritems():
                 individu[outputName] = {
-                    periode_1: row[inputName].replace(',', '.')
+                    month: float(row[inputName].replace(',', '.')) / 12 for month in months
                 }
             n = n + 1
         print(n)
 
     from pprint import pprint
-    pprint(situations)
+    #pprint(situations)
 
     tax_benefit_system = openfisca_france.CountryTaxBenefitSystem()
     simulation_actuelle = Simulation(
         tax_benefit_system=tax_benefit_system,
         simulation_json=situations,
         trace=True)
+
+    import numpy
+
+    import pandas as pd
+
+    threshold = 10
+    results = pd.DataFrame()
+    results['ids'] = simulation_actuelle.get_variable_entity('af').ids
 
     for calcul, periodes in calculs.iteritems():
         print(calcul)
@@ -160,13 +180,22 @@ def main():
             valeurs = simulation_actuelle.calculate(calcul, periode)
             sources = simulation_actuelle.calculate(calcul, periode_1)
 
+            print (numpy.histogram(valeurs - sources))
+            print(100.0 * sum((valeurs != 0) * (abs(valeurs - sources) < threshold)) / sum(valeurs != 0))
+
+            results[calcul + periode_1] = sources
+            results[calcul + periode] = valeurs
+
             resultat = dict(zip(ids, zip(valeurs, sources)))
             for matricul, valeurs in resultat.iteritems():
                 calculee, reelle = valeurs
-                print (matricul, reelle, calculee)
 
     if len(ids) == 1:
         simulation_actuelle.tracer.print_computation_log()
+
+    outpath = getPath(key='', ext=timestamp + '.out.csv')
+    print(outpath)
+    results.to_csv(outpath, index=False, decimal=",", sep=";")
 
 
 if __name__ == '__main__':

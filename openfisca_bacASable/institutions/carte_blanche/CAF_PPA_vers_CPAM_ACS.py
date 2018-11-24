@@ -11,13 +11,18 @@ periodes = [periode]
 calculs = {
     'ppa': periodes,
     'acs': periodes,
-#    'cmu_c': periodes,
+    'cmu_c': periodes,
 }
 
 m3 = '2018-10'
 m2 = '2018-09'
 m1 = '2018-08'
 m0 = '2018-07'
+
+from openfisca_core.periods import period
+
+
+ninePreviousMonths = [period('month:2018-07').offset(-i, 'month') for i in range(0,9)]
 
 n_limit = 20000
 def generate_CAF(path):
@@ -39,19 +44,22 @@ def generate_CAF(path):
             MATRICUL = row['rownum']
             situations['individus'][MATRICUL] = {
                 'salaire_net': {
-                    m1: row['MTOTFOY1'],
-                    m2: row['MTOTFOY2'],
-                    m3: row['MTOTFOY3'],
-                    m0: 3 * (float(row['MTOTFOY1']) + float(row['MTOTFOY2']) + float(row['MTOTFOY3']))
+                    m : 0 for m in ninePreviousMonths #(float(row['MTOTFOY1']) + float(row['MTOTFOY2']) + float(row['MTOTFOY3']))
                 }
             }
+
+            situations['individus'][MATRICUL]['salaire_net'][periode] = row['MTOTFOY1']
+            situations['individus'][MATRICUL]['salaire_net'][m1] = row['MTOTFOY1']
+            situations['individus'][MATRICUL]['salaire_net'][m2] = row['MTOTFOY2']
+            situations['individus'][MATRICUL]['salaire_net'][m3] = row['MTOTFOY3']
+
             situations['familles'][MATRICUL] = {
                 'acs': {
                     m3: 0
                 },
                 'cmu_c': {
-                    periode: False,
-                    m3: False
+#                    periode: False,
+#                    m3: False
                 },
                 'parents': [MATRICUL],
                 'ppa': {
@@ -93,13 +101,13 @@ def main():
             sources = simulation_actuelle.calculate(calcul, m3)
 
             csv_input['_'.join(['openfisca', calcul, periode])] = valeurs
-            print (numpy.histogram(valeurs - sources))
+            #print (numpy.histogram(valeurs - sources))
 
             resultat = dict(zip(ids, zip(valeurs, sources)))
             for matricul, valeurs in resultat.iteritems():
                 calculee, reelle = valeurs
 
-    csv_input.to_csv(filepath + '.out.csv', index=False)
+    csv_input.to_csv(filepath + '.out.csv', index=False, decimal=",", sep=";")
 
 if __name__ == '__main__':
     sys.exit(main())
