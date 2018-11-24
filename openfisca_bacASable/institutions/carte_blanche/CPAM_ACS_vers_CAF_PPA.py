@@ -37,7 +37,7 @@ situations = {
 }
 
 ressourceMapping = {
-#    'MNTSAL_RES': 'salaire traitement',
+    'MNTSAL_RES': 'salaire_net',
 #    'MNTBOU_RES': '',
 #    'MNTCHO_RES': 'chomage',
     'MNTPER_RES': 'pensions_alimentaires_percues',
