@@ -47,7 +47,7 @@ ressourceMapping = {
 
     'MNTAUT_RES': 'salaire_net', # Autre revenus : montants TODO LIBAUT_RES
     'MNTBOU_RES': 'salaire_net', # Bourses étude enseignement sup.
-    'MNTCHA_RES': 'salaire_net', # Montant du chiffre d’affaire
+#    'MNTCHA_RES': 'salaire_net', # Montant du chiffre d’affaire
     'MNTIJO_RES': 'salaire_net', # indemnités journalières
     'MNTNON_RES': 'salaire_net', # Revenus des professions non salariées
     'MNTPRF_RES': 'salaire_net', # prestations familiales
