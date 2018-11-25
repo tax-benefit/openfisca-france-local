@@ -45,14 +45,14 @@ ressourceMapping = {
     'MNTPRE_RES': 'retraite_nette', # Préretraites
     'MNTSAL_RES': 'salaire_net', # Traitements et salaires
 
-    'MNTAUT_RES': 'salaire_net', # Autre revenus : montants TODO LIBAUT_RES
-    'MNTBOU_RES': 'salaire_net', # Bourses étude enseignement sup.
+    'MNTAUT_RES': 'gains_exceptionnels', # Autre revenus : montants TODO LIBAUT_RES
+    'MNTBOU_RES': 'bourse_enseignement_sup', # Bourses étude enseignement sup.
 #    'MNTCHA_RES': 'salaire_net', # Montant du chiffre d’affaire
-    'MNTIJO_RES': 'salaire_net', # indemnités journalières
-    'MNTNON_RES': 'salaire_net', # Revenus des professions non salariées
+    'MNTIJO_RES': 'indemnites_journalieres', # indemnités journalières
+    'MNTNON_RES': 'tns_auto_entrepreneur_benefice', # Revenus des professions non salariées
     'MNTPEV_RES': 'pensions_alimentaires_versees_individu', # Pensions alimentaires versées
     'MNTPRF_RES': 'af', # prestations familiales
-    'MNTSEC_RES': 'salaire_net', # Secours et aides réguliers
+    'MNTSEC_RES': 'af', # Secours et aides réguliers
 }
 
 def main():
