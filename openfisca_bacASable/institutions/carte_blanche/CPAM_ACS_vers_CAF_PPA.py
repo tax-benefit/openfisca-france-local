@@ -216,6 +216,10 @@ def main():
             famille['aide_logement'][periode] += float(row['MNTAPL_RES'].replace(',', '.')) / 12
             famille['cmu_forfait_logement_al'][periode] += float(row['MNTAPL_RES'].replace(',', '.'))
 
+            if row['S'] != '?':
+                for month in months:
+                    individu['gains_exceptionnels'][month] += float(row['S'] + row['MNTLIB_RES'].replace(',', '.')) / 12
+
             n = n + 1
         print(n)
 
