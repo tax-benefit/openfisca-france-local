@@ -8,6 +8,8 @@ import sys
 from openfisca_core.periods import period
 
 
+from reforme import CPAMReform
+
 
 class StripperReader(object):
     def __init__(self, reader):
@@ -37,12 +39,19 @@ situations = {
 }
 
 ressourceMapping = {
-    'MNTSAL_RES': 'salaire_net', # Traitements et salaires
-#    'MNTBOU_RES': '', # Bourses étude enseignement sup.
-#    'MNTCHO_RES': 'chomage', # Allocations chômage
+    'MNTCHO_RES': 'chomage_net', # Allocations chômage
     'MNTPER_RES': 'pensions_alimentaires_percues', # Pensions alimentaires reçues
     'MNTRET_RES': 'retraite_nette', # Pensions, retraites et rentes
     'MNTPRE_RES': 'retraite_nette', # Préretraites
+    'MNTSAL_RES': 'salaire_net', # Traitements et salaires
+
+    'MNTAUT_RES': 'salaire_net', # Autre revenus : montants TODO LIBAUT_RES
+    'MNTBOU_RES': 'salaire_net', # Bourses étude enseignement sup.
+    'MNTCHA_RES': 'salaire_net', # Montant du chiffre d’affaire
+    'MNTIJO_RES': 'salaire_net', # indemnités journalières
+    'MNTNON_RES': 'salaire_net', # Revenus des professions non salariées
+    'MNTPRF_RES': 'salaire_net', # prestations familiales
+    'MNTSEC_RES': 'salaire_net', # Secours et aides réguliers
 }
 
 def main():
@@ -89,6 +98,7 @@ def main():
                 'acs_plafond': {
                     periode_1: row['ACSPLA_CMU']
                 },
+                'af': { m: 0 for m in months },
                 'aspa': { m: 0 for m in months },
                 'cmu_c': {
                     periode_1: row['C'] == 'A'
@@ -176,7 +186,7 @@ def main():
     from pprint import pprint
     #pprint(situations)
 
-    tax_benefit_system = openfisca_france.CountryTaxBenefitSystem()
+    tax_benefit_system = CPAMReform(openfisca_france.CountryTaxBenefitSystem())
     simulation_actuelle = Simulation(
         tax_benefit_system=tax_benefit_system,
         simulation_json=situations,
