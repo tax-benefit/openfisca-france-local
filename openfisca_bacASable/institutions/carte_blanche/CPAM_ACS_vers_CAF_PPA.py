@@ -50,11 +50,13 @@ ressourceMapping = {
 #    'MNTCHA_RES': 'salaire_net', # Montant du chiffre d’affaire
     'MNTIJO_RES': 'salaire_net', # indemnités journalières
     'MNTNON_RES': 'salaire_net', # Revenus des professions non salariées
-    'MNTPRF_RES': 'salaire_net', # prestations familiales
+    'MNTPRF_RES': 'af', # prestations familiales
     'MNTSEC_RES': 'salaire_net', # Secours et aides réguliers
 }
 
 def main():
+    tax_benefit_system = CPAMReform(openfisca_france.CountryTaxBenefitSystem())
+
     periode = '2018-11'
     periode_1 = '2018-10'
     months = period('year:2018-11').offset(-1, 'year').get_subperiods('month')
@@ -99,19 +101,28 @@ def main():
                     periode_1: row['ACSPLA_CMU']
                 },
                 'af': { m: 0 for m in months },
+                'aide_logement': { m: 0 for m in months },
+                'asf': { m: 0 for m in months },
                 'aspa': { m: 0 for m in months },
+                'cf': { m: 0 for m in months },
+                'paje_clca': { m: 0 for m in months },
+                'paje_prepare': { m: 0 for m in months },
                 'cmu_c': {
                     periode_1: row['C'] == 'A'
                 },
                 'cmu_base_ressources': {
                     periode_1: row['TOTMNT_CMU'].replace(',', '.')
                 },
+                'cmu_forfait_logement_al': { m: 0 for m in months },
                 'rsa': {
                     periode: 0
                 },
                 'parents': [],
                 'enfants': []
             }
+            situations['familles'][MATRICUL]['aide_logement'][periode] = 0
+            situations['familles'][MATRICUL]['cmu_forfait_logement_al'][periode] = 0
+
             situations['foyers_fiscaux'][MATRICUL] = {
                 'declarants': [],
                 'personnes_a_charge': []
@@ -135,8 +146,14 @@ def main():
             situations['individus'][MATRICUL] = {
                 'date_naissance': {
                     periode: '{0}-{1}-{2}'.format(NAIDSI[0:4], NAIDSI[4:6], NAIDSI[6:])
-                }
+                },
+                'aah': { m: 0 for m in months },
+                'asi': { m: 0 for m in months },
+                'ass': { m: 0 for m in months },
+                'caah': { m: 0 for m in months },
+                'rsa_base_ressources_patrimoine_individu': { m: 0 for m in months },
             }
+            situations['individus'][MATRICUL]['ass'][periode] = 0
 
             if len(situations['familles'][GROUP]['parents']) == 0:
                 situations['familles'][GROUP]['parents'].append(MATRICUL)
@@ -154,6 +171,8 @@ def main():
             n = n + 1
     print(n)
 
+    from pprint import pprint
+
     with open(getPath('res')) as csvfile:
         reader = StripperReader(csv.DictReader(csvfile, delimiter=';'))
         n = 0
@@ -163,30 +182,38 @@ def main():
             if MATRICUL not in situations['individus']:
                 continue
 
+            famille = situations['familles'][GROUP]
             individu = situations['individus'][MATRICUL]
             for inputName, outputName in ressourceMapping.iteritems():
-                individu[outputName] = {
-                    month: 0 for month in months
-                }
+                variable = tax_benefit_system.get_variable(outputName)
+                dest = individu if variable.entity.key == 'individu' else famille
+
+                if outputName not in dest:
+                    dest[outputName] = {
+                        month: 0 for month in months
+                    }
 
             for inputName, outputName in ressourceMapping.iteritems():
+                variable = tax_benefit_system.get_variable(outputName)
+                dest = individu if variable.entity.key == 'individu' else famille
                 for month in months:
-                    individu[outputName][month] += float(row[inputName].replace(',', '.')) / 12
+                    dest[outputName][month] += float(row[inputName].replace(',', '.')) / 12
 
-            famille = situations['familles'][GROUP]
-            famille['aide_logement'] = {
-                month: float(row['MNTAPL_RES'].replace(',', '.')) / 12 for month in months
-            }
-            famille['aide_logement'][periode] = float(row['MNTAPL_RES'].replace(',', '.')) / 12
-            famille['cmu_forfait_logement_al'] = { periode: float(row['MNTAPL_RES'].replace(',', '.')) }
+            if row['TCHO'] == 'O':
+                individu['activite'] = { month: 'chomeur' for month in months }
+                individu['activite'][periode] = 'chomeur'
+                individu['chomage_net'][periode] = 1
+
+            for month in months:
+                famille['aide_logement'][month] += float(row['MNTAPL_RES'].replace(',', '.')) / 12
+            famille['aide_logement'][periode] += float(row['MNTAPL_RES'].replace(',', '.')) / 12
+            famille['cmu_forfait_logement_al'][periode] += float(row['MNTAPL_RES'].replace(',', '.'))
 
             n = n + 1
         print(n)
 
-    from pprint import pprint
     #pprint(situations)
 
-    tax_benefit_system = CPAMReform(openfisca_france.CountryTaxBenefitSystem())
     simulation_actuelle = Simulation(
         tax_benefit_system=tax_benefit_system,
         simulation_json=situations,
