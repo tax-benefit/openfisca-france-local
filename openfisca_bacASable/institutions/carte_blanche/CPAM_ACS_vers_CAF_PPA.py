@@ -200,8 +200,14 @@ def main():
                 for month in months:
                     dest[outputName][month] += float(row[inputName].replace(',', '.')) / 12
 
+            individu['activite'] = {}
             if row['TCHO'] == 'O':
-                individu['activite'] = { month: 'chomeur' for month in months }
+                for month in months:
+                    individu['activite'][month] = 'chomeur'
+                individu['activite'][periode] = 'chomeur'
+                individu['chomage_net'][periode] = 1
+
+            if row['TALD'] == 'O':
                 individu['activite'][periode] = 'chomeur'
                 individu['chomage_net'][periode] = 1
 
