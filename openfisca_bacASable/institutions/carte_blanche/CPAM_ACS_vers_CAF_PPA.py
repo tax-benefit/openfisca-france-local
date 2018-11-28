@@ -2,13 +2,13 @@
 from openfisca_core.simulations import Simulation
 import openfisca_france
 
+
+from pprint import pprint
 import sys
 
 
 from openfisca_core.periods import period
 
-
-from reforme import CPAMReform
 
 
 class StripperReader(object):
@@ -56,6 +56,7 @@ ressourceMapping = {
 }
 
 def main():
+    from reforme import CPAMReform
     tax_benefit_system = CPAMReform(openfisca_france.CountryTaxBenefitSystem())
 
     periode = '2018-11'
@@ -66,6 +67,7 @@ def main():
     calculs = {
         #'acs_plafond': periodes,
         #'acs': periodes,
+        #'acs_montant': periodes,
         'cmu_base_ressources': periodes,
         #'cmu_c': periodes,
     }
@@ -96,7 +98,10 @@ def main():
                 break
             situations['familles'][MATRICUL] = {
                 'acs': {
-                    periode_1: row['ACSM'] if row['C'] == 'B' else 0
+                    periode_1: row['ACSM'] if (row['C'] == 'B' or row['C'] == 'C') else (0 if row['C'] == 'A' else -1)
+                },
+                'acs_montant': {
+                    periode_1: row['ACSM'] if (row['C'] == 'B' or row['C'] == 'C') else 0
                 },
                 'acs_plafond': {
                     periode_1: row['ACSPLA_CMU']
@@ -133,6 +138,7 @@ def main():
                 'conjoint': [],
                 'enfants': []
             }
+    print(n)
 
     with open(getPath('coc')) as csvfile:
         reader = StripperReader(csv.DictReader(csvfile, delimiter=';'))
@@ -144,7 +150,7 @@ def main():
             if GROUP not in situations['familles']:
                 continue
 
-            situations['individus'][MATRICUL] = {
+            individu = {
                 'date_naissance': {
                     periode: '{0}-{1}-{2}'.format(NAIDSI[0:4], NAIDSI[4:6], NAIDSI[6:])
                 },
@@ -154,25 +160,33 @@ def main():
                 'caah': { m: 0 for m in months },
                 'rsa_base_ressources_patrimoine_individu': { m: 0 for m in months },
             }
+            situations['individus'][MATRICUL] = individu
             situations['individus'][MATRICUL]['ass'][periode] = 0
 
-            if len(situations['familles'][GROUP]['parents']) == 0:
+            if row['ASSMAC_COC'] == row['NIRBEN_COC'] and row['ASSMAC_COC'][1:5] == NAIDSI[2:6]:
+                # Demandeur
                 situations['familles'][GROUP]['parents'].append(MATRICUL)
                 situations['foyers_fiscaux'][GROUP]['declarants'].append(MATRICUL)
                 situations['menages'][GROUP]['personne_de_reference'].append(MATRICUL)
-            elif len(situations['familles'][GROUP]['parents']) == 1:
+            elif row['ASSMAC_COC'] != row['NIRBEN_COC']:
+                # Conjoint
                 situations['familles'][GROUP]['parents'].append(MATRICUL)
                 situations['foyers_fiscaux'][GROUP]['declarants'].append(MATRICUL)
                 situations['menages'][GROUP]['conjoint'].append(MATRICUL)
+            elif row['ASSMAC_COC'] == row['NIRBEN_COC'] and row['ODRNIR_COC'] == row['NIRBEN_COC']:
+                # Enfants
+                situations['familles'][GROUP]['enfants'].append(MATRICUL)
+                situations['foyers_fiscaux'][GROUP]['personnes_a_charge'].append(MATRICUL)
+                situations['menages'][GROUP]['enfants'].append(MATRICUL)
             else:
+                # Enfants
                 situations['familles'][GROUP]['enfants'].append(MATRICUL)
                 situations['foyers_fiscaux'][GROUP]['personnes_a_charge'].append(MATRICUL)
                 situations['menages'][GROUP]['enfants'].append(MATRICUL)
 
+
             n = n + 1
     print(n)
-
-    from pprint import pprint
 
     with open(getPath('res')) as csvfile:
         reader = StripperReader(csv.DictReader(csvfile, delimiter=';'))
@@ -246,7 +260,7 @@ def main():
             sources = simulation_actuelle.calculate(calcul, periode_1)
 
             print (numpy.histogram(valeurs - sources))
-            print(100.0 * sum((valeurs != 0) * (abs(valeurs - sources) < threshold)) / sum(valeurs != 0))
+            print(100.0 * sum((sources != 0) * (abs(valeurs - sources) < threshold)) / sum(sources != 0))
 
             results[calcul + periode_1] = sources
             results[calcul + periode] = valeurs
