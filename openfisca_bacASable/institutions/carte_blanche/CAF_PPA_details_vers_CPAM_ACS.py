@@ -41,7 +41,7 @@ def main():
     import csv
 
     limitedIds = []
-    n_limit = 3
+    n_limit = 5
 
     import datetime
     now = datetime.datetime.now()
@@ -129,7 +129,8 @@ def main():
 
     ressourceMapping = {
         'Revenus d\'activité salariée': 'salaire_net',
-        'Revenus du patrimoine. Spécifique PPA': 'revenus_locatifs'
+        'Revenus du patrimoine. Spécifique PPA': 'revenus_locatifs',
+        'Allocations de chômage': 'chomage_net',
     }
 
     with open(getPath('RSM')) as csvfile:
