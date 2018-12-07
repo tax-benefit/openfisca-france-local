@@ -30,12 +30,11 @@ def main():
 
     periode = '2018-11'
     ref_periode = '2017-11'
-    periode_1 = '2018-10'
-    months = period('year:2018-11').offset(-1, 'year').get_subperiods('month')
+    months = period('year:' + periode).offset(-1, 'year').get_subperiods('month')
 
     periodes = [periode]
     calculs = {
-        'ppa': periodes,
+        'ppa_versee': periodes,
     }
 
     import csv
@@ -66,7 +65,7 @@ def main():
             situations['familles'][MATRICUL] = {
                 'parents': [],
                 'enfants': [],
-                'ppa': {
+                'ppa_versee': {
                     ref_periode: row['MTDROVAL']
                 },
                 'rsa_nb_enfants': {},
@@ -97,6 +96,10 @@ def main():
 
             demandeur = row['NUIDEMPA']
 
+            situations['familles'][MATRICUL]['ppa_mois_demande']= {
+                'ETERNITY': getMonth(row['DTDEMPPA']) + '-01'
+            }
+
             situations['individus'][demandeur] = {}
             situations['familles'][MATRICUL]['parents'].append(demandeur)
             situations['foyers_fiscaux'][MATRICUL]['declarants'].append(demandeur)
@@ -124,7 +127,6 @@ def main():
             situations['familles'][MATRICUL]['af'][periode] = row['MTPFPAF']
             situations['familles'][MATRICUL]['af_base'][periode] = row['MTPFPAF']
             situations['familles'][MATRICUL]['ppa_forfait_logement'][periode] = row['MTFLOPAF']
-
     print(n)
 
     ressourceMapping = {
@@ -142,7 +144,7 @@ def main():
         'Revenu des professions non salariés CGA ou trimestriel': None,
         'Revenu ETI/marin pêcheur/exploitant agricole': None,
         'Revenus d\'activité salariée': 'salaire_net',
-        'Revenus d\' activité évalués professions non salariées. Spécifique PPA': None,
+        'Revenus d\' activité évalués professions non salariées. Spécifique PPA': 'salaire_net',
         'Revenus du patrimoine. Spécifique PPA': 'revenus_locatifs',
     }
 
