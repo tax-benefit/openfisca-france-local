@@ -41,7 +41,7 @@ def main():
     import csv
 
     limitedIds = []
-    n_limit = 1
+    n_limit = 3
 
     import datetime
     now = datetime.datetime.now()
@@ -52,6 +52,9 @@ def main():
         n = 0
         for row in reader:
             MATRICUL = row['MATRICUL']
+
+            if len(limitedIds) and MATRICUL not in limitedIds:
+                continue
 
             if row['NATPF'] != 'PPA' or row['MOISDROV'] != '01/11/2018':
                 continue
@@ -66,10 +69,10 @@ def main():
                 'ppa': {
                     ref_periode: row['MTDROVAL']
                 },
-                'rsa_nb_enfants': { m: 2 for m in months },
-                'af': { periode: 92.68 },
-                'af_base': { periode: 92.68 },
-                'ppa_forfait_logement': { periode: 163.8 },
+                'rsa_nb_enfants': {},
+                'af': {},
+                'af_base': {},
+                'ppa_forfait_logement': {},
             }
             situations['foyers_fiscaux'][MATRICUL] = {
                 'declarants': [],
@@ -100,8 +103,33 @@ def main():
             situations['menages'][MATRICUL]['personne_de_reference'].append(demandeur)
     print(n)
 
+    with open(getPath('PAG')) as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        n = 0
+        for row in reader:
+            MATRICUL = row['MATRICUL']
+
+            if MATRICUL not in situations['menages']:
+                continue
+            n = n + 1
+
+            mois = getMonth(row['MOIPRFIC'])
+
+            situations['familles'][MATRICUL]['af'][mois] = row['MTPFPAF']
+            situations['familles'][MATRICUL]['af_base'][mois] = row['MTPFPAF']
+            situations['familles'][MATRICUL]['rsa_nb_enfants'][mois] = row['NBENFPPA']
+            situations['familles'][MATRICUL]['ppa_forfait_logement'][mois] = row['MTFLOPAF']
+
+            # Hack current implementation where rsa_nb_enfants and ppa_forfait_logement are looked at periode instead of in the past
+            situations['familles'][MATRICUL]['af'][periode] = row['MTPFPAF']
+            situations['familles'][MATRICUL]['af_base'][periode] = row['MTPFPAF']
+            situations['familles'][MATRICUL]['ppa_forfait_logement'][periode] = row['MTFLOPAF']
+
+    print(n)
+
     ressourceMapping = {
-        'Revenus d\'activité salariée': 'salaire_net'
+        'Revenus d\'activité salariée': 'salaire_net',
+        'Revenus du patrimoine. Spécifique PPA': 'revenus_locatifs'
     }
 
     with open(getPath('RSM')) as csvfile:
@@ -119,10 +147,16 @@ def main():
 
             individu = row['NUINPERS']
             if individu not in situations['individus']:
-                situations['individus'][individu] = {}
-                situations['familles'][MATRICUL]['enfants'].append(individu)
-                situations['foyers_fiscaux'][MATRICUL]['personnes_a_charge'].append(individu)
-                situations['menages'][MATRICUL]['enfants'].append(individu)
+                if row['TYPEPER'] == 'Enfant':
+                    situations['individus'][individu] = {}
+                    situations['familles'][MATRICUL]['enfants'].append(individu)
+                    situations['foyers_fiscaux'][MATRICUL]['personnes_a_charge'].append(individu)
+                    situations['menages'][MATRICUL]['enfants'].append(individu)
+                else:
+                    situations['individus'][individu] = {}
+                    situations['familles'][MATRICUL]['parents'].append(individu)
+                    situations['foyers_fiscaux'][MATRICUL]['personnes_a_charge'].append(individu)
+                    situations['menages'][MATRICUL]['conjoint'].append(individu)
 
             mois = getMonth(row['MOISRESS'])
             ressource = ressourceMapping[row['NATRESS']]
