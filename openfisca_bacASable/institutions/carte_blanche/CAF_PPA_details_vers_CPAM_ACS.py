@@ -41,7 +41,7 @@ def main():
     import csv
 
     limitedIds = []
-    n_limit = 5
+    n_limit = 10e4
 
     import datetime
     now = datetime.datetime.now()
@@ -128,9 +128,22 @@ def main():
     print(n)
 
     ressourceMapping = {
-        'Revenus d\'activité salariée': 'salaire_net',
-        'Revenus du patrimoine. Spécifique PPA': 'revenus_locatifs',
         'Allocations de chômage': 'chomage_net',
+        'Argent placé': None,
+        'Autres IJSS (maladie, AT, MP)': 'rsa_indemnites_journalieres_activite',
+        'Autres revenus imposables': None,
+        'Indemnités maternité _ paternité _ adoption': 'rsa_indemnites_journalieres_activite',
+        'Pension d\'invalidité': 'pensions_invalidite',
+        'Pension de vieillesse imposable': 'retraite_nette',
+        'Pensions alimentaires reçues': 'pensions_alimentaires_percues',
+        'Remunération stage formation': 'revenus_stage_formation_pro',
+        'Rente AT à titre personnel': None,
+        'Ressources nulles': None,
+        'Revenu des professions non salariés CGA ou trimestriel': None,
+        'Revenu ETI/marin pêcheur/exploitant agricole': None,
+        'Revenus d\'activité salariée': 'salaire_net',
+        'Revenus d\' activité évalués professions non salariées. Spécifique PPA': None,
+        'Revenus du patrimoine. Spécifique PPA': 'revenus_locatifs',
     }
 
     with open(getPath('RSM')) as csvfile:
@@ -162,6 +175,9 @@ def main():
             mois = getMonth(row['MOISRESS'])
             ressource = ressourceMapping[row['NATRESS']]
             montant = float(row['MTNRESSM'].replace(',', '.'))
+
+            if not ressource:
+                continue
 
             if ressource not in situations['individus'][individu]:
                 situations['individus'][individu][ressource] = {
@@ -195,7 +211,7 @@ def main():
             sources = simulation_actuelle.calculate(calcul, ref_periode)
 
             print (numpy.histogram(valeurs - sources))
-            print(100.0 * sum((sources != 0) * (abs(valeurs - sources) < threshold)) / sum(sources != 0))
+            print(100.0 * sum((abs(valeurs - sources) < threshold)) / len(sources))
 
             results[calcul + ref_periode] = sources
             results[calcul + periode] = valeurs
@@ -209,9 +225,9 @@ def main():
         pprint(situations)
         simulation_actuelle.tracer.print_computation_log()
 
-    #outpath = getPath(key='', ext=timestamp + '.out.csv')
-    #print(outpath)
-    #results.to_csv(outpath, index=False, decimal=",", sep=";")
+    outpath = getPath(key='out', ext=timestamp + '.csv')
+    print(outpath)
+    results.to_csv(outpath, index=False, decimal=",", sep=";")
 
 
 if __name__ == '__main__':
