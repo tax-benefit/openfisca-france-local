@@ -130,9 +130,9 @@ def main():
     ressourceMapping = {
         'Allocations de chômage': 'chomage_net',
         'Argent placé': None,
-        'Autres IJSS (maladie, AT, MP)': 'rsa_indemnites_journalieres_activite',
+        'Autres IJSS (maladie, AT, MP)': 'indemnites_journalieres_maladie',
         'Autres revenus imposables': None,
-        'Indemnités maternité _ paternité _ adoption': 'rsa_indemnites_journalieres_activite',
+        'Indemnités maternité _ paternité _ adoption': 'indemnites_journalieres_maternite',
         'Pension d\'invalidité': 'pensions_invalidite',
         'Pension de vieillesse imposable': 'retraite_nette',
         'Pensions alimentaires reçues': 'pensions_alimentaires_percues',
