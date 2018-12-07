@@ -58,6 +58,9 @@ def main():
             if row['NATPF'] != 'PPA' or row['MOISDROV'] != '01/11/2018':
                 continue
 
+            if row['MTDROVAL'] == '0.00':
+                continue
+
             n = n + 1
             if n > n_limit:
                 break
@@ -72,6 +75,7 @@ def main():
                 'af': {},
                 'af_base': {},
                 'ppa_forfait_logement': {},
+                'rsa_isolement_recent': {m: True for m in months}
             }
             situations['foyers_fiscaux'][MATRICUL] = {
                 'declarants': [],
@@ -82,6 +86,7 @@ def main():
                 'conjoint': [],
                 'enfants': []
             }
+            situations['familles'][MATRICUL]['rsa_isolement_recent'][periode] = True
     print(n)
 
     with open(getPath('PAD')) as csvfile:
@@ -124,9 +129,11 @@ def main():
             situations['familles'][MATRICUL]['ppa_forfait_logement'][mois] = row['MTFLOPAF']
 
             # Hack current implementation where rsa_nb_enfants and ppa_forfait_logement are looked at periode instead of in the past
-            situations['familles'][MATRICUL]['af'][periode] = row['MTPFPAF']
-            situations['familles'][MATRICUL]['af_base'][periode] = row['MTPFPAF']
-            situations['familles'][MATRICUL]['ppa_forfait_logement'][periode] = row['MTFLOPAF']
+            for (resource, origin) in [('af', 'MTPFPAF'), ('af_base', 'MTPFPAF'), ('ppa_forfait_logement', 'MTFLOPAF')]:
+                situations['familles'][MATRICUL][resource][periode] = row[origin]
+                for m in months:
+                    if m not in situations['familles'][MATRICUL][resource]:
+                        situations['familles'][MATRICUL][resource][m] = row[origin]
     print(n)
 
     ressourceMapping = {
