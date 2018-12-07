@@ -40,7 +40,7 @@ def main():
 
     import csv
 
-    ids = []
+    limitedIds = []
     n_limit = 1
 
     import datetime
@@ -165,13 +165,14 @@ def main():
             results[calcul + ref_periode] = sources
             results[calcul + periode] = valeurs
             results[calcul + 'adiff'] = abs(sources - valeurs)
-            print(valeurs)
 
             results = results.sort_values(by=[calcul + 'adiff'], ascending=False)
+            print(results)
 
-    pprint(situations)
 
-    simulation_actuelle.tracer.print_computation_log()
+    if len(limitedIds) == 1:
+        pprint(situations)
+        simulation_actuelle.tracer.print_computation_log()
 
     #outpath = getPath(key='', ext=timestamp + '.out.csv')
     #print(outpath)
