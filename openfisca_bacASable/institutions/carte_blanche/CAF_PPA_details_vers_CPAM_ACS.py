@@ -75,7 +75,7 @@ def main():
                 'af': {},
                 'af_base': {},
                 'ppa_forfait_logement': {},
-                'rsa_isolement_recent': {m: True for m in months}
+                'rsa_isolement_recent': {}
             }
             situations['foyers_fiscaux'][MATRICUL] = {
                 'declarants': [],
@@ -86,7 +86,6 @@ def main():
                 'conjoint': [],
                 'enfants': []
             }
-            situations['familles'][MATRICUL]['rsa_isolement_recent'][periode] = True
     print(n)
 
     with open(getPath('PAD')) as csvfile:
@@ -127,13 +126,7 @@ def main():
             situations['familles'][MATRICUL]['af_base'][mois] = row['MTPFPAF']
             situations['familles'][MATRICUL]['rsa_nb_enfants'][mois] = row['NBENFPPA']
             situations['familles'][MATRICUL]['ppa_forfait_logement'][mois] = row['MTFLOPAF']
-
-            # Hack current implementation where rsa_nb_enfants and ppa_forfait_logement are looked at periode instead of in the past
-            for (resource, origin) in [('af', 'MTPFPAF'), ('af_base', 'MTPFPAF'), ('ppa_forfait_logement', 'MTFLOPAF')]:
-                situations['familles'][MATRICUL][resource][periode] = row[origin]
-                for m in months:
-                    if m not in situations['familles'][MATRICUL][resource]:
-                        situations['familles'][MATRICUL][resource][m] = row[origin]
+            situations['familles'][MATRICUL]['rsa_isolement_recent'][periode] = False#row['SIFAMPAF'] == 'Isolé' and int(row['NBENFPPA'])>0
     print(n)
 
     ressourceMapping = {
@@ -231,8 +224,8 @@ def main():
 
 
     if len(limitedIds) == 1:
-        pprint(situations)
         simulation_actuelle.tracer.print_computation_log()
+        pprint(situations)
 
     outpath = getPath(key='out', ext=timestamp + '.csv')
     print(outpath)
