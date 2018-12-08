@@ -101,7 +101,7 @@ def main():
             demandeur = row['NUIDEMPA']
 
             situations['familles'][MATRICUL]['ppa_mois_demande']= {
-                'ETERNITY': getMonth(row['DTDEMPPA']) + '-01'
+                'ETERNITY': getMonth(row['DTPMTRIR']) + '-01'
             }
 
             situations['individus'][demandeur] = {}
