@@ -13,7 +13,7 @@ from openfisca_core.periods import period
 # find *.csv -type f -exec iconv -f iso-8859-1 -t utf-8 "{}" -o "{}"utf8.csv \;
 
 def getPath(key, ext=''):
-    return sys.argv[-1].format(key) + ext
+    return sys.argv[1].format(key) + ext
 
 def getMonth(string):
     return re.sub('^(?P<jour>\d{2})/(?P<mois>\d{2})/(?P<annee>\d{4})$', '\g<annee>-\g<mois>', string)
@@ -39,6 +39,10 @@ def main():
 
     import csv
 
+    excludedIds = []
+    if len(sys.argv)>2:
+        excludedIds = sys.argv[2].split(',')
+
     limitedIds = []
     n_limit = 10e4
 
@@ -51,6 +55,9 @@ def main():
         n = 0
         for row in reader:
             MATRICUL = row['MATRICUL']
+
+            if MATRICUL in excludedIds:
+                continue
 
             if len(limitedIds) and MATRICUL not in limitedIds:
                 continue
@@ -157,9 +164,6 @@ def main():
             if MATRICUL not in situations['menages']:
                 continue
 
-            if row['NATRESS'] == 'Ressources nulles':
-                continue
-            n = n + 1
 
             individu = row['NUINPERS']
             if individu not in situations['individus']:
@@ -173,6 +177,10 @@ def main():
                     situations['familles'][MATRICUL]['parents'].append(individu)
                     situations['foyers_fiscaux'][MATRICUL]['personnes_a_charge'].append(individu)
                     situations['menages'][MATRICUL]['conjoint'].append(individu)
+
+            if row['NATRESS'] == 'Ressources nulles':
+                continue
+            n = n + 1
 
             mois = getMonth(row['MOISRESS'])
             ressource = ressourceMapping[row['NATRESS']]
