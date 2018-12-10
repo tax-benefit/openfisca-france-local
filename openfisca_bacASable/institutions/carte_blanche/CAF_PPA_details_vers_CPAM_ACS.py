@@ -164,8 +164,8 @@ def main():
             if MATRICUL not in situations['menages']:
                 continue
 
-
             individu = row['NUINPERS']
+
             if individu not in situations['individus']:
                 if row['TYPEPER'] == 'Enfant':
                     situations['individus'][individu] = {}
@@ -178,9 +178,6 @@ def main():
                     situations['foyers_fiscaux'][MATRICUL]['personnes_a_charge'].append(individu)
                     situations['menages'][MATRICUL]['conjoint'].append(individu)
 
-            if row['NATRESS'] == 'Ressources nulles':
-                continue
-            n = n + 1
 
             mois = getMonth(row['MOISRESS'])
             ressource = ressourceMapping[row['NATRESS']]
@@ -189,6 +186,7 @@ def main():
             if not ressource:
                 continue
 
+            n = n + 1
             if ressource not in situations['individus'][individu]:
                 situations['individus'][individu][ressource] = {
                     mois: 0
