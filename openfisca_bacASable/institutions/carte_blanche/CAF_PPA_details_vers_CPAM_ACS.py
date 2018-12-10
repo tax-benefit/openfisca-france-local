@@ -42,6 +42,7 @@ def main():
     excludedIds = []
     if len(sys.argv)>2:
         excludedIds = sys.argv[2].split(',')
+        print(str(len(excludedIds)) + ' excluded Ids')
 
     limitedIds = []
     n_limit = 10e4
