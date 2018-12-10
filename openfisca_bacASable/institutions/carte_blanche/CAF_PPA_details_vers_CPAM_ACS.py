@@ -150,7 +150,7 @@ def main():
         'Rente AT à titre personnel': None,
         'Ressources nulles': None,
         'Revenu des professions non salariés CGA ou trimestriel': None,
-        'Revenu ETI/marin pêcheur/exploitant agricole': None,
+        'Revenu ETI/marin pêcheur/exploitant agricole': 'tns_benefice_exploitant_agricole',
         'Revenus d\'activité salariée': 'salaire_net',
         'Revenus d\' activité évalués professions non salariées. Spécifique PPA': 'salaire_net',
         'Revenus du patrimoine. Spécifique PPA': 'revenus_locatifs',
@@ -186,6 +186,10 @@ def main():
             mois = getMonth(row['MOISRESS'])
             ressource = ressourceMapping[row['NATRESS']]
             montant = float(row['MTNRESSM'].replace(',', '.'))
+
+            if ressource in ['tns_benefice_exploitant_agricole']:
+                montant = montant * 12
+                mois = '2017'
 
             if not ressource:
                 continue
