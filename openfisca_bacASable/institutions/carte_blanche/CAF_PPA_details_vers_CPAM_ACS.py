@@ -164,6 +164,9 @@ def main():
             if MATRICUL not in situations['menages']:
                 continue
 
+            if row['TITRESMO'] != 'Ressources mensuelles RSA ou PPA':
+                continue
+
             individu = row['NUINPERS']
 
             if individu not in situations['individus']:
