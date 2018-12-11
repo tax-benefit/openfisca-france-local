@@ -26,6 +26,7 @@ situations = {
 }
 
 def main():
+    variable = 'ppa_versee'
     tax_benefit_system = openfisca_france.CountryTaxBenefitSystem()
 
     periode = '2018-11'
@@ -34,7 +35,7 @@ def main():
 
     periodes = [periode]
     calculs = {
-        'ppa_versee': periodes,
+        variable: periodes,
     }
 
     import csv
@@ -67,7 +68,7 @@ def main():
                 continue
 
             if row['MTDROVAL'] == '0.00':
-                continue
+                pass#continue
 
             n = n + 1
             if n > n_limit:
@@ -76,7 +77,7 @@ def main():
             situations['familles'][MATRICUL] = {
                 'parents': [],
                 'enfants': [],
-                'ppa_versee': {
+                variable: {
                     ref_periode: row['MTDROVAL']
                 },
                 'rsa_nb_enfants': {},
