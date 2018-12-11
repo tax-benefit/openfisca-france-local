@@ -58,7 +58,7 @@ def main():
         for row in reader:
             MATRICUL = row['MATRICUL']
 
-            if MATRICUL in excludedIds:
+            if MATRICUL in excludedIds and MATRICUL not in limitedIds:
                 continue
 
             if len(limitedIds) and MATRICUL not in limitedIds:
