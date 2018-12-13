@@ -113,7 +113,10 @@ def main():
                 'ETERNITY': getMonth(row['DTPMTRIR']) + '-01'
             }
 
-            situations['individus'][demandeur] = {}
+            situations['individus'][demandeur] = {
+#                'taux_incapacite': { m: 0.9 for m in months },
+#                'aah': { m: 532.2 for m in months },
+            }
             situations['familles'][MATRICUL]['parents'].append(demandeur)
             situations['foyers_fiscaux'][MATRICUL]['declarants'].append(demandeur)
             situations['menages'][MATRICUL]['personne_de_reference'].append(demandeur)
@@ -166,8 +169,13 @@ def main():
             if MATRICUL not in situations['menages']:
                 continue
 
+            ressource = ressourceMapping[row['NATRESS']]
+
             if row['TITRESMO'] != 'Ressources mensuelles RSA ou PPA':
-                continue
+                if row['TITRESMO'] == 'Ressources mensuelles AAH' and ressource == 'salaire_net':
+                    ressource = 'salaire_imposable'
+                else:
+                    continue
 
             individu = row['NUINPERS']
 
@@ -183,9 +191,7 @@ def main():
                     situations['foyers_fiscaux'][MATRICUL]['personnes_a_charge'].append(individu)
                     situations['menages'][MATRICUL]['conjoint'].append(individu)
 
-
             mois = getMonth(row['MOISRESS'])
-            ressource = ressourceMapping[row['NATRESS']]
             montant = float(row['MTNRESSM'].replace(',', '.'))
 
             if ressource in ['tns_benefice_exploitant_agricole']:
