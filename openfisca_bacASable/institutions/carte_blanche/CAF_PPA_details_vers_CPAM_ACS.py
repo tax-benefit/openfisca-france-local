@@ -20,6 +20,9 @@ def getPath(key, ext=''):
 def getMonth(string):
     return re.sub('^(?P<jour>\d{2})/(?P<mois>\d{2})/(?P<annee>\d{4})$', '\g<annee>-\g<mois>', string)
 
+def getDay(string):
+    return re.sub('^(?P<jour>\d{2})/(?P<mois>\d{2})/(?P<annee>\d{4})$', '\g<annee>-\g<mois>-\g<jour>', string)
+
 situations = {
   'individus': {},
   'familles': {},
@@ -215,18 +218,43 @@ def main():
             situations['individus'][individu][ressource][mois] += montant
     print(n)
 
+    with open(getPath('ENFANTS')) as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')
+        n = 0
+        for row in reader:
+            MATRICUL = row['MATRICUL']
+
+            if MATRICUL not in situations['menages']:
+                continue
+
+            individu = row['NUINPENF']
+
+            if individu not in situations['individus']:
+                situations['individus'][individu] = {}
+                situations['familles'][MATRICUL]['enfants'].append(individu)
+                situations['foyers_fiscaux'][MATRICUL]['personnes_a_charge'].append(individu)
+                situations['menages'][MATRICUL]['enfants'].append(individu)
+
+            n = n + 1
+            i = situations['individus'][individu]
+            dob = getDay(row['DTNAIENF'])
+            i['date_naissance'] = {
+                'ETERNITY': dob
+            }
+    print(n)
+
     simulation_actuelle = Simulation(
         tax_benefit_system=tax_benefit_system,
         simulation_json=situations,
         trace=True)
 
     threshold = 10
+
     results = pd.DataFrame()
     results['ids'] = simulation_actuelle.get_variable_entity('af').ids
 
     for calcul, periodes in calculs.iteritems():
         print(calcul)
-        ids = simulation_actuelle.get_variable_entity(calcul).ids
         for periode in periodes:
             valeurs = simulation_actuelle.calculate(calcul, periode)
             sources = simulation_actuelle.calculate(calcul, ref_periode)
