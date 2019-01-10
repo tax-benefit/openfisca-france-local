@@ -2,9 +2,11 @@
 from openfisca_core.simulations import Simulation
 import openfisca_france
 
-
+import csv
+import datetime
+import numpy
+import pandas as pd
 from pprint import pprint
-import codecs
 import re
 import sys
 
@@ -40,7 +42,6 @@ def main():
         variable: periodes,
     }
 
-    import csv
 
     excludedIds = []
     if len(sys.argv)>2:
@@ -50,7 +51,6 @@ def main():
     limitedIds = []
     n_limit = 10e4
 
-    import datetime
     now = datetime.datetime.now()
     timestamp = now.isoformat().replace(':','-').replace('.', '-')
 
@@ -219,10 +219,6 @@ def main():
         tax_benefit_system=tax_benefit_system,
         simulation_json=situations,
         trace=True)
-
-    import numpy
-
-    import pandas as pd
 
     threshold = 10
     results = pd.DataFrame()
