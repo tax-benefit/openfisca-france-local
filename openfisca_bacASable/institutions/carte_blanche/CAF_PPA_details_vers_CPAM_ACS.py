@@ -26,6 +26,8 @@ situations = {
 }
 
 def main():
+    if len(sys.argv) < 2:
+        raise ValueError('Un chemin de la forme \'/chemin/vers/dossier/{0}.csv\' doit être passé en paramètre.')
     variable = 'ppa_versee'
     tax_benefit_system = openfisca_france.CountryTaxBenefitSystem()
 
