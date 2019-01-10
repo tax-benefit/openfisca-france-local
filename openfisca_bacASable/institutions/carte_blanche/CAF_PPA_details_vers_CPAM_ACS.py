@@ -86,8 +86,7 @@ def main():
                     ref_periode: row['MTDROVAL']
                 },
                 'rsa_nb_enfants': {},
-                'af': {},
-                'af_base': {},
+                'ppa_base_ressources_prestations_familiales': {},
                 'ppa_forfait_logement': {},
                 'rsa_isolement_recent': {}
             }
@@ -139,8 +138,7 @@ def main():
 
             mois = getMonth(row['MOIPRFIC'])
 
-            situations['familles'][MATRICUL]['af'][mois] = row['MTPFPAF']
-            situations['familles'][MATRICUL]['af_base'][mois] = row['MTPFPAF']
+            situations['familles'][MATRICUL]['ppa_base_ressources_prestations_familiales'][mois] = row['MTPFPAF']
             situations['familles'][MATRICUL]['rsa_nb_enfants'][mois] = row['NBENFPPA']
             situations['familles'][MATRICUL]['ppa_forfait_logement'][mois] = row['MTFLOPAF']
             situations['familles'][MATRICUL]['rsa_isolement_recent'][periode] = False#row['SIFAMPAF'] == 'Isolé' and int(row['NBENFPPA'])>0
