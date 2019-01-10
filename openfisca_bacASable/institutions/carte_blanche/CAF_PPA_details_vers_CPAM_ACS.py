@@ -201,6 +201,9 @@ def main():
                 montant = montant * 12
                 mois = '2017'
 
+            if ressource == 'revenus_locatifs':
+                mois = period('month:' + mois).offset(-2, 'year')
+
             if not ressource:
                 continue
 
