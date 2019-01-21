@@ -157,9 +157,9 @@ def main():
         'Rente AT à titre personnel': None,
         'Ressources nulles': None,
         'Revenu des professions non salariés CGA ou trimestriel': None,
-        'Revenu ETI/marin pêcheur/exploitant agricole': 'tns_benefice_exploitant_agricole',
+        'Revenu ETI/marin pêcheur/exploitant agricole': None,
         'Revenus d\'activité salariée': 'salaire_net',
-        'Revenus d\' activité évalués professions non salariées. Spécifique PPA': 'salaire_net',
+        'Revenus d\' activité évalués professions non salariées. Spécifique PPA': 'ppa_rsa_tns_mensuel',
         'Revenus du patrimoine. Spécifique PPA': 'revenus_locatifs',
     }
 
