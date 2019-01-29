@@ -5,7 +5,6 @@ import openfisca_france
 import csv
 import datetime
 import numpy
-import pandas as pd
 from pprint import pprint
 import re
 import sys
@@ -31,6 +30,8 @@ situations = {
 }
 
 def main():
+    import pandas as pd
+
     if len(sys.argv) < 2:
         raise ValueError('Un chemin de la forme \'/chemin/vers/dossier/{0}.csv\' doit être passé en paramètre.')
     variable = 'ppa_versee'
