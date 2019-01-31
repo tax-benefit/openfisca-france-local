@@ -6,3 +6,11 @@ age:
   maximum:
     values:
       2009-01-01: 25
+degressivite:
+  reference: 'Article R5131-21 du code du travail - https://www.legifrance.gouv.fr/affichCodeArticle.do;jsessionid=DED54A598193DDE1DF59E0AE16BDE87D.tplgfr21s_3?idArticle=LEGIARTI000033700946&cidTexte=LEGITEXT000006072050&dateTexte=20190131'
+  seuil:
+    values:
+      2009-01-01: 300
+  plafond_multiple_smic:
+    values:
+      2009-01-01: 0.80
