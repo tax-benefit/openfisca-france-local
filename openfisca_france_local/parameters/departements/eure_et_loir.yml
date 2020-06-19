@@ -1,0 +1,38 @@
+adefip:
+  description: Eure-et-Loir, Aide départementale financière d'insertion personnalisée (AdéFIP)
+  montant:
+    description: Montant de l'AdéFip Eure-et-Loir par condition de reprise d'activité professionnelle
+    formation:
+      description: Montant de l'AdéFip Eure-et-Loir à la reprise d'une formation \
+        égale ou supérieure à 3 mois
+      values:
+        2015-12-01:
+          value: 500
+    cdd:
+      plus_3_mois:
+        description: Montant de l'AdéFip Eure-et-Loir à la reprise d'un CDD de 3 à 6 mois
+        values:
+          2015-12-01:
+            value: 400
+      plus_6_mois:
+        description: Montant de l'AdéFip Eure-et-Loir à la reprise d'un CDD de plus de 6 mois
+        values:
+          2015-12-01:
+            value: 500
+    cdi:
+      temps_plein:
+        description: Montant de l'AdéFip Eure-et-Loir à la reprise d'un CDI à temps plein
+        values:
+          2015-12-01:
+            value: 600
+      temps_partiel:
+        description: Montant de l'AdéFip Eure-et-Loir à la reprise d'un CDI \
+          à temps partiel et supérieur à 15 heures par semaine
+        values:
+          2015-12-01:
+            value: 300
+    entreprise:
+      description: Montant de l'AdéFip Eure-et-Loir à la création ou reprise d'entreprise 
+      values:
+        2015-12-01:
+          value: 700
