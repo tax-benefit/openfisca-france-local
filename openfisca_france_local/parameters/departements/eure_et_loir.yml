@@ -2,6 +2,7 @@ adefip:
   description: Eure-et-Loir, Aide départementale financière d'insertion personnalisée (AdéFIP)
   montant:
     description: Montant de l'AdéFip Eure-et-Loir par condition de reprise d'activité professionnelle
+    reference: ./sources_du_droit/departements/eure_et_loir/adefip/Réglement Departemental RSA-AdéFIP.pdf
     formation:
       description: Montant de l'AdéFip Eure-et-Loir à la reprise d'une formation \
         égale ou supérieure à 3 mois
