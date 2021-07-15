@@ -13,7 +13,7 @@ install_dependencies: &install_dependencies
     name: Install dependencies
     command: |
       pip install . --upgrade && pip install ".[test,excel-reader]"
-      pip install --editable git+https://github.com/openfisca/openfisca-france.git@msa_ajoute_données_adefip#egg=OpenFisca-Core  # use a specific branch of OpenFisca-France
+      pip install --editable git+https://github.com/openfisca/openfisca-france.git@msa_ajoute_données_adefip#egg=OpenFisca-France  # use a specific branch of OpenFisca-France
 
 check_version: &check_version
   run:
