@@ -1,0 +1,27 @@
+- name: Eligibilité d'un étudiant.e seul.e qui poursuit des études avec des revenus mensuels
+  period: 2021-10
+  input:
+      date_naissance: 2001-01-01
+      salaire_net:
+        2021-08: 700
+        2021-09: 700
+        2021-10: 700
+        2021-11: 700
+        2021-12: 700
+      activite: etudiant
+  output:
+    aide_poursuite_etudes: 1000
+
+- name: Etudiant non éligible avec des revenus mensuels
+  period: 2021-10
+  input:
+      date_naissance: 2001-01-01
+      salaire_net:
+        2021-08: 1200
+        2021-09: 1200
+        2021-10: 1200
+        2021-11: 1200
+        2021-12: 1200
+      activite: etudiant
+  output:
+    aide_poursuite_etudes: 0

@@ -1,0 +1,21 @@
+reference: 'https://portesdebretagne.msa.fr/lfy/aide-a-la-poursuite-d-etudes'
+age_minimal:
+  values:
+    2020-09-01:
+      value: 16
+age_maximum:
+  values:
+    2020-09-01:
+      value: 25
+seuil_ressources:
+  values:
+    2020-09-01:
+      value: .55
+maximum:
+  values:
+    2020-09-01:
+      value: 600
+minimum:
+  values:
+    2020-09-01:
+      value: 400
